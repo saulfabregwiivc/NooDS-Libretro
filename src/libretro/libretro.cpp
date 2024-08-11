@@ -55,6 +55,7 @@ static std::string screenSwapMode;
 
 static int screenArrangement;
 static int screenRotation;
+static int screenPosition;
 
 static bool gbaModeEnabled;
 static bool renderGbaScreen;
@@ -102,6 +103,27 @@ static int rotationMap [] = {
   2, // 1 - RotatedLeft   2 - Counter-clockwise
   0, // 2 - UpsideDown    0 - Normal
   1, // 3 - RotatedRight  1 - Clockwise
+};
+
+static int positionMap [4][3] = {
+  { 0, 3, 4 }, // Automatic     | Center, Left, Right
+  { 0, 3, 4 }, // Vertical      | Center, Left, Right
+  { 0, 1, 2 }, // Horizontal    | Center, Top, Bottom
+  { 0, 0, 0 }, // Single Screen | Center, Center, Center
+};
+
+static int viewPositionMap [4][5] = {
+  { 0, 1, 2, 3, 4 }, // 0 - Normal       | No change
+  { 0, 1, 2, 4, 3 }, // 1 - RotatedLeft  | Center, Top, Bottom, Right, Left
+  { 0, 1, 2, 3, 4 }, // 2 - UpsideDown   | No change
+  { 0, 2, 1, 3, 4 }, // 3 - RotatedRight | Center, Bottom, Top, Left, Right
+};
+
+static int touchPositionMap [4][5] = {
+  { 0, 1, 2, 3, 4 }, // 0 - Normal       | No change
+  { 0, 3, 4, 2, 1 }, // 1 - RotatedLeft  | Center, Left, Right, Bottom, Top
+  { 0, 1, 2, 3, 4 }, // 2 - UpsideDown   | No change
+  { 0, 4, 3, 1, 2 }, // 3 - RotatedRight | Center, Right, Left, Top, Bottom
 };
 
 static int32_t clampValue(int32_t value, int32_t min, int32_t max)
@@ -251,7 +273,7 @@ static void initConfig()
     { "noods_screenArrangement", "Screen Arrangement; Automatic|Vertical|Horizontal|Single Screen" },
     { "noods_screenRotation", "Screen Rotation; Normal|Rotated Left|Rotated Right" },
     { "noods_screenSizing", "Screen Sizing; Even|Enlarge Top|Enlarge Bottom" },
-    { "noods_screenPosition", "Screen Position; Center|Top|Bottom|Left|Right" },
+    { "noods_screenPosition", "Screen Position; Center|Start|End" },
     { "noods_screenGap", "Screen Gap; None|Quarter|Half|Full" },
     { "noods_gbaCrop", "Crop GBA Screen; enabled|disabled" },
     { "noods_screenFilter", "Screen Filter; Nearest|Upscaled|Linear" },
@@ -289,13 +311,14 @@ static void updateConfig()
 
   screenArrangement = fetchVariableEnum("noods_screenArrangement", {"Automatic", "Vertical", "Horizontal", "Single Screen"});
   screenRotation = fetchVariableEnum("noods_screenRotation", {"Normal", "Rotated Left", "Upside Down", "Rotated Right"});
+  screenPosition = fetchVariableEnum("noods_screenPosition", {"Center", "Start", "End"});
+
   screenSwapMode = fetchVariable("noods_swapScreenMode", "Toggle");
   touchMode = fetchVariable("noods_touchMode", "Touch");
   showTouchCursor = fetchVariableBool("noods_touchCursor", true);
 
   ScreenLayout::gbaCrop = fetchVariableBool("noods_gbaCrop", true);
   ScreenLayout::screenSizing = fetchVariableEnum("noods_screenSizing", {"Even", "Enlarge Top", "Enlarge Bottom"});
-  ScreenLayout::screenPosition = fetchVariableEnum("noods_screenPosition", {"Center", "Top", "Bottom", "Left", "Right"});
   ScreenLayout::screenGap = fetchVariableEnum("noods_screenGap", {"None", "Quarter", "Half", "Full"});
 
   int screenSizing = 0; int screenWidth = 0; int screenHeight = 0;
@@ -308,6 +331,9 @@ static void updateConfig()
 
   ScreenLayout::screenArrangement = screenRotation ? arrangeMap[screenArrangement] : screenArrangement;
   ScreenLayout::screenRotation = rotationMap[0];
+  ScreenLayout::screenPosition = positionMap[ScreenLayout::screenArrangement][screenPosition];
+  ScreenLayout::screenPosition = viewPositionMap[screenRotation][ScreenLayout::screenPosition];
+
   layout.update(0, 0, gbaModeEnabled, false);
 
   if (ScreenLayout::screenSizing && ScreenLayout::screenArrangement == 2)
@@ -339,6 +365,8 @@ static void updateConfig()
 
   ScreenLayout::screenArrangement = screenArrangement;
   ScreenLayout::screenRotation = rotationMap[screenRotation];
+  ScreenLayout::screenPosition = touchPositionMap[screenRotation][ScreenLayout::screenPosition];
+
   touch.update(0, 0, gbaModeEnabled, false);
 
   if (screenWidth && screenHeight)
