@@ -144,6 +144,11 @@ static std::string normalizePath(std::string path, bool addSlash = false)
 static std::string getNameFromPath(std::string path)
 {
   std::string base = path.substr(path.find_last_of("/\\") + 1);
+  for (const auto& delim : {".zip#", ".7z#", ".apk#"})
+  {
+    size_t delimPos = base.find(delim);
+    if (delimPos != std::string::npos) base = base.substr(0, delimPos);
+  }
   return base.substr(0, base.rfind("."));
 }
 
@@ -669,7 +674,7 @@ void retro_get_system_info(retro_system_info* info)
   info->valid_extensions = "nds";
   info->library_version = VERSION;
   info->library_name = "NooDS";
-  info->block_extract = true;
+  info->block_extract = false;
 }
 
 void retro_get_system_av_info(retro_system_av_info* info)
