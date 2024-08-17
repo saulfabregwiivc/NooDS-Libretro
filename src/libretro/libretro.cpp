@@ -988,19 +988,13 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 size_t retro_serialize_size(void)
 {
   FILE* tmpFile = tmpfile();
-
-  int fd = fileno(tmpFile);
-  core->saveStates.setFd(fd, false);
-
-  core->saveStates.checkState();
-  core->saveStates.saveState();
+  core->saveStates.saveState(tmpFile);
 
   fflush(tmpFile);
   fseek(tmpFile, 0, SEEK_END);
-  size_t size = ftell(tmpFile);
 
+  size_t size = ftell(tmpFile);
   fclose(tmpFile);
-  close(fd);
 
   return size;
 }
@@ -1008,19 +1002,13 @@ size_t retro_serialize_size(void)
 bool retro_serialize(void* data, size_t size)
 {
   FILE* tmpFile = tmpfile();
-
-  int fd = fileno(tmpFile);
-  core->saveStates.setFd(fd, false);
-
-  core->saveStates.checkState();
-  core->saveStates.saveState();
+  core->saveStates.saveState(tmpFile);
 
   fflush(tmpFile);
   fseek(tmpFile, 0, SEEK_SET);
-  fread(data, 1, size, tmpFile);
 
+  fread(data, 1, size, tmpFile);
   fclose(tmpFile);
-  close(fd);
 
   return true;
 }
@@ -1028,18 +1016,13 @@ bool retro_serialize(void* data, size_t size)
 bool retro_unserialize(const void* data, size_t size)
 {
   FILE* tmpFile = tmpfile();
-
   fwrite(data, 1, size, tmpFile);
+
   fflush(tmpFile);
+  fseek(tmpFile, 0, SEEK_SET);
 
-  int fd = fileno(tmpFile);
-  core->saveStates.setFd(fd, false);
-
-  core->saveStates.checkState();
-  core->saveStates.loadState();
-
+  core->saveStates.loadState(tmpFile);
   fclose(tmpFile);
-  close(fd);
 
   return true;
 }
