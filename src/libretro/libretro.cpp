@@ -987,16 +987,8 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 size_t retro_serialize_size(void)
 {
-  FILE* tmpFile = tmpfile();
-  core->saveStates.saveState(tmpFile);
-
-  fflush(tmpFile);
-  fseek(tmpFile, 0, SEEK_END);
-
-  size_t size = ftell(tmpFile);
-  fclose(tmpFile);
-
-  return size;
+  // HACK: Usually around 6MB but can vary frame to frame!
+  return 1024 * 1024 * 8;
 }
 
 bool retro_serialize(void* data, size_t size)
@@ -1005,7 +997,7 @@ bool retro_serialize(void* data, size_t size)
   core->saveStates.saveState(tmpFile);
 
   fflush(tmpFile);
-  fseek(tmpFile, 0, SEEK_SET);
+  rewind(tmpFile);
 
   fread(data, 1, size, tmpFile);
   fclose(tmpFile);
@@ -1019,7 +1011,7 @@ bool retro_unserialize(const void* data, size_t size)
   fwrite(data, 1, size, tmpFile);
 
   fflush(tmpFile);
-  fseek(tmpFile, 0, SEEK_SET);
+  rewind(tmpFile);
 
   core->saveStates.loadState(tmpFile);
   fclose(tmpFile);
