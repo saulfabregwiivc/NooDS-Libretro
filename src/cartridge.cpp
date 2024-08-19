@@ -539,6 +539,9 @@ void CartridgeNds::writeAuxSpiData(bool cpu, uint8_t value)
     }
     else
     {
+        // Get save size from database
+        if (saveSize == -1) detectSaveSize();
+
         // Incredibly naive save type detection, based on commands that might be sent
         if (saveSize == -1)
         {

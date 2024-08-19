@@ -122,7 +122,12 @@ class CartridgeNds: public Cartridge
         uint64_t decrypt64(uint64_t value);
         void initKeycode(int level);
         void applyKeycode();
+        void detectSaveSize();
 };
+
+#ifndef __LIBRETRO__
+  void CartridgeNds::detectSaveSize() {}
+#endif
 
 class CartridgeGba: public Cartridge
 {
