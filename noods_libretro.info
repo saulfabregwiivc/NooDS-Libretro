@@ -1,16 +1,28 @@
+# Software Information
 display_name = "Nintendo - DS (NooDS)"
 authors = "Hydr8gon"
 supported_extensions = "nds"
 corename = "NooDS"
-manufacturer = "Nintendo"
+license = "GPLv3"
+permissions = "microphone_optional"
+display_version = "Git"
 categories = "Emulator"
+
+# Hardware Information
+manufacturer = "Nintendo"
 systemname = "Nintendo DS"
 systemid = "nds"
+
+# Libretro Features
 database = "Nintendo - Nintendo DS|Nintendo - Nintendo DS (Download Play)"
-license = "GPLv3"
-permissions = ""
-display_version = "Git"
 supports_no_game = "true"
+cheats = "true"
+core_options = "true"
+savestate = "true"
+savestate_features = "serialized"
+load_subsystem = "true"
+needs_fullpath = "true"
+disk_control = "false"
 hw_render = "false"
 
 # Firmware / BIOS
