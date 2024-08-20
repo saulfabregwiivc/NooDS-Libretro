@@ -57,6 +57,7 @@ class Memory
         void updateMap9(uint32_t start, uint32_t end, bool tcm = false);
         void updateMap7(uint32_t start, uint32_t end);
         void updateVram();
+        uint8_t *getRam() { return ram; }
 
         template <typename T> T read(bool arm7, uint32_t address, bool tcm = true);
         template <typename T> void write(bool arm7, uint32_t address, T value, bool tcm = true);
