@@ -479,15 +479,7 @@ static void copyScreen(uint32_t *src, uint32_t *dst, int sw, int sh, int dx, int
     int dstY = (dy + y) * stride + dx;
 
     for (int x = 0; x < dw; ++x)
-    {
-      uint32_t pixel = src[srcY + (x / scaleX)];
-
-      dst[dstY + x] =
-        ((pixel & 0xFF000000)) |
-        ((pixel & 0x00FF0000) >> 16) |
-        ((pixel & 0x0000FF00)) |
-        ((pixel & 0x000000FF) << 16);
-    }
+      dst[dstY + x] = src[srcY + (x / scaleX)];
   }
 }
 
