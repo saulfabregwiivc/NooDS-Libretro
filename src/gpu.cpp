@@ -100,11 +100,7 @@ uint16_t Gpu::rgb6ToRgb5(uint32_t color)
     uint8_t r = ((color >>  0) & 0x3F) / 2;
     uint8_t g = ((color >>  6) & 0x3F) / 2;
     uint8_t b = ((color >> 12) & 0x3F) / 2;
-#ifdef __LIBRETRO__
-    return BIT(15) | (r << 10) | (g << 5) | b;
-#else
     return BIT(15) | (b << 10) | (g << 5) | r;
-#endif
 }
 
 bool Gpu::getFrame(uint32_t *out, bool gbaCrop)
