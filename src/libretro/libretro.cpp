@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstring>
 #include <regex>
+#include <chrono>
 
 #include <fcntl.h>
 #include <fstream>
@@ -69,6 +70,10 @@ static bool showTouchCursor;
 static bool screenSwapped;
 static bool swapScreens;
 static bool screenTouched;
+
+static auto cursorTimeout = 0;
+static auto cursorMovedAt = std::chrono::steady_clock::now();
+static bool cursorVisible = false;
 
 static int lastMouseX = 0;
 static int lastMouseY = 0;
@@ -188,6 +193,16 @@ static bool fetchVariableBool(std::string key, bool def)
   return fetchVariable(key, def ? "enabled" : "disabled") == "enabled";
 }
 
+static int fetchVariableInt(std::string key, int def)
+{
+  std::string value = fetchVariable(key, std::to_string(def));
+
+  if (!value.empty() && std::isdigit(value[0]))
+    return std::stoi(value);
+
+  return 0;
+}
+
 static int fetchVariableEnum(std::string key, std::vector<std::string> list, int def = 0)
 {
   auto val = fetchVariable(key, list[def]);
@@ -286,6 +301,7 @@ static void initConfig()
     { "noods_swapScreenMode", "Swap Screen Mode; Toggle|Hold" },
     { "noods_touchMode", "Touch Mode; Auto|Pointer|Joystick|None" },
     { "noods_touchCursor", "Show Touch Cursor; enabled|disabled" },
+    { "noods_cursorTimeout", "Hide Cursor Timeout; 3 Seconds|5 Seconds|10 Seconds|15 Seconds|20 Seconds|Never Hide" },
     { "noods_micInputMode", "Microphone Input Mode; Silence|Noise|Microphone" },
     { "noods_micButtonMode", "Microphone Button Mode; Toggle|Hold|Always" },
     { nullptr, nullptr }
@@ -321,6 +337,7 @@ static void updateConfig()
   screenSwapMode = fetchVariable("noods_swapScreenMode", "Toggle");
   touchMode = fetchVariable("noods_touchMode", "Touch");
   showTouchCursor = fetchVariableBool("noods_touchCursor", true);
+  cursorTimeout = fetchVariableInt("noods_cursorTimeout", 3);
 
   ScreenLayout::gbaCrop = fetchVariableBool("noods_gbaCrop", true);
   ScreenLayout::screenSizing = fetchVariableEnum("noods_screenSizing", {"Even", "Enlarge Top", "Enlarge Bottom"});
@@ -521,7 +538,7 @@ static void drawTexture(uint32_t *buffer)
       width
     );
 
-    if (showTouchCursor)
+    if (showTouchCursor && cursorVisible)
       drawCursor(videoBuffer.data(), touchX, touchY);
   }
 
@@ -594,6 +611,24 @@ static void sendMicSamples()
 
   if (samplesRead)
     core->spi.sendMicData(buffer, samplesRead, 44100);
+}
+
+static void updateCursorState()
+{
+  if (showTouchCursor && cursorTimeout)
+  {
+    if (cursorVisible)
+    {
+      auto current = std::chrono::steady_clock::now();
+      auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(current - cursorMovedAt).count();
+
+      if (elapsed >= cursorTimeout) cursorVisible = false;
+    }
+  }
+  else
+  {
+    cursorVisible = true;
+  }
 }
 
 static int getSaveFileDesc(std::string path)
@@ -831,6 +866,7 @@ void retro_run(void)
 {
   checkConfigVariables();
   updateScreenState();
+  updateCursorState();
   inputPollCallback();
 
   for (int i = 0; i < sizeof(keymap) / sizeof(*keymap); ++i)
@@ -945,6 +981,12 @@ void retro_run(void)
         pointerX = touchX + static_cast<int>((moveX / 32767) * speedX);
         pointerY = touchY + static_cast<int>((moveY / 32767) * speedY);
       }
+    }
+
+    if (cursorTimeout && (pointerX != touchX || pointerY != touchY))
+    {
+      cursorVisible = true;
+      cursorMovedAt = std::chrono::steady_clock::now();
     }
 
     touchX = clampValue(pointerX, 0, layout.botWidth);
