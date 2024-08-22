@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "libretro.h"
+#include "savestate.h"
 
 #include "../common/screen_layout.h"
 #include "../settings.h"
@@ -1027,30 +1028,18 @@ size_t retro_serialize_size(void)
 
 bool retro_serialize(void* data, size_t size)
 {
-  FILE* tmpFile = tmpfile();
-  core->saveStates.saveState(tmpFile);
-
-  fflush(tmpFile);
-  rewind(tmpFile);
-
-  fread(data, 1, size, tmpFile);
-  fclose(tmpFile);
-
-  return true;
+  SaveState saveState(core);
+  return saveState.save(data, size);
 }
 
 bool retro_unserialize(const void* data, size_t size)
 {
-  FILE* tmpFile = tmpfile();
-  fwrite(data, 1, size, tmpFile);
+  SaveState saveState(core);
 
-  fflush(tmpFile);
-  rewind(tmpFile);
+  if (!saveState.check(data, size))
+    return false;
 
-  core->saveStates.loadState(tmpFile);
-  fclose(tmpFile);
-
-  return true;
+  return saveState.load(data, size);
 }
 
 unsigned retro_get_region(void)

@@ -44,10 +44,6 @@ class SaveStates
         bool saveState();
         bool loadState();
 
-        StateResult checkState(FILE *file);
-        bool saveState(FILE *file);
-        bool loadState(FILE *file);
-
     private:
         Core *core;
         std::string ndsPath, gbaPath;

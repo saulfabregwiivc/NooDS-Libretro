@@ -54,14 +54,6 @@ StateResult SaveStates::checkState()
     // Try to open the state file, if it exists
     FILE *file = openFile("rb");
     if (!file) return STATE_FILE_FAIL;
-
-    StateResult result = checkState(file);
-    fclose(file);
-    return result;
-}
-
-StateResult SaveStates::checkState(FILE *file)
-{
     fseek(file, 0, SEEK_END);
     uint32_t size = ftell(file);
     fseek(file, 0, SEEK_SET);
@@ -72,6 +64,7 @@ StateResult SaveStates::checkState(FILE *file)
     uint32_t version;
     fread(tag, sizeof(uint8_t), 4, file);
     fread(&version, sizeof(uint32_t), 1, file);
+    fclose(file);
 
     // Check if the format tag matches
     for (int i = 0; i < 4; i++)
@@ -89,14 +82,6 @@ bool SaveStates::saveState()
     // Open the state file and write the header
     FILE *file = openFile("wb");
     if (!file) return false;
-
-    saveState(file);
-    fclose(file);
-    return true;
-}
-
-bool SaveStates::saveState(FILE *file)
-{
     fwrite(stateTag, sizeof(uint8_t), 4, file);
     fwrite(&stateVersion, sizeof(uint32_t), 1, file);
 
@@ -126,6 +111,7 @@ bool SaveStates::saveState(FILE *file)
     core->timers[0].saveState(file);
     core->timers[1].saveState(file);
     core->wifi.saveState(file);
+    fclose(file);
     return true;
 }
 
@@ -134,14 +120,6 @@ bool SaveStates::loadState()
     // Open the state file and read past the header
     FILE *file = openFile("rb");
     if (!file) return false;
-
-    loadState(file);
-    fclose(file);
-    return true;
-}
-
-bool SaveStates::loadState(FILE *file)
-{
     fseek(file, 8, SEEK_SET);
 
     // Load the state of every component
@@ -170,5 +148,6 @@ bool SaveStates::loadState(FILE *file)
     core->timers[0].loadState(file);
     core->timers[1].loadState(file);
     core->wifi.loadState(file);
+    fclose(file);
     return true;
 }
