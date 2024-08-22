@@ -127,7 +127,7 @@ class CartridgeNds: public Cartridge
 };
 
 #ifndef __LIBRETRO__
-  void CartridgeNds::detectSaveSize() {}
+FORCE_INLINE void CartridgeNds::detectSaveSize() {}
 #endif
 
 class CartridgeGba: public Cartridge
