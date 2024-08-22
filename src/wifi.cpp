@@ -32,7 +32,7 @@ Wifi::Wifi(Core *core): core(core)
     bbRegisters[0x64] = 0xFF;
 }
 
-void Wifi::saveState(FILE *file)
+void Wifi::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&scheduled, sizeof(scheduled), 1, file);
@@ -81,7 +81,7 @@ void Wifi::saveState(FILE *file)
     fwrite(wConfig, 2, sizeof(wConfig) / 2, file);
 }
 
-void Wifi::loadState(FILE *file)
+void Wifi::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&scheduled, sizeof(scheduled), 1, file);

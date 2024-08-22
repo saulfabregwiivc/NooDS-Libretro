@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../core.h"
+#include "../memfile.h"
 
 class SaveState
 {

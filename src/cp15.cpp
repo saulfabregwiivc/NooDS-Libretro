@@ -20,7 +20,7 @@
 #include "cp15.h"
 #include "core.h"
 
-void Cp15::saveState(FILE *file)
+void Cp15::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&ctrlReg, sizeof(ctrlReg), 1, file);
@@ -28,7 +28,7 @@ void Cp15::saveState(FILE *file)
     fwrite(&itcmReg, sizeof(itcmReg), 1, file);
 }
 
-void Cp15::loadState(FILE *file)
+void Cp15::loadState(MemFile &file)
 {
     // Read state data from the file
     uint32_t ctrl, dtcm, itcm;

@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "defines.h"
+#include "memfile.h"
 
 class Core;
 
@@ -106,8 +107,8 @@ class Gpu3D
         uint16_t vertexCountOut = 0;
 
         Gpu3D(Core *core): core(core) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void runCommand();
         void swapBuffers();

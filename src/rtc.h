@@ -23,6 +23,7 @@
 #include <cstdint>
 
 #include "defines.h"
+#include "memfile.h"
 
 class Core;
 
@@ -30,8 +31,8 @@ class Rtc
 {
     public:
         Rtc(Core *core): core(core) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void enableGpRtc() { gpRtc = true; }
         void reset();

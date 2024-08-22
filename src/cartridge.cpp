@@ -177,7 +177,7 @@ void Cartridge::resizeSave(int newSize, bool dirty)
     mutex.unlock();
 }
 
-void CartridgeNds::saveState(FILE *file)
+void CartridgeNds::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&saveSize, sizeof(saveSize), 1, file);
@@ -200,7 +200,7 @@ void CartridgeNds::saveState(FILE *file)
     fwrite(romCmdOut, 8, sizeof(romCmdOut) / 8, file);
 }
 
-void CartridgeNds::loadState(FILE *file)
+void CartridgeNds::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&saveSize, sizeof(saveSize), 1, file);
@@ -1025,7 +1025,7 @@ uint32_t CartridgeNds::readRomDataIn(bool cpu)
     return 0xFFFFFFFF;
 }
 
-void CartridgeGba::saveState(FILE *file)
+void CartridgeGba::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&saveSize, sizeof(saveSize), 1, file);
@@ -1039,7 +1039,7 @@ void CartridgeGba::saveState(FILE *file)
     fwrite(&flashErase, sizeof(flashErase), 1, file);
 }
 
-void CartridgeGba::loadState(FILE *file)
+void CartridgeGba::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&saveSize, sizeof(saveSize), 1, file);

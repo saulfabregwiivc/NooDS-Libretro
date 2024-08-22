@@ -32,7 +32,7 @@ Spi::~Spi()
     if (micBuffer) delete[] micBuffer;
 }
 
-void Spi::saveState(FILE *file)
+void Spi::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&writeCount, sizeof(writeCount), 1, file);
@@ -42,7 +42,7 @@ void Spi::saveState(FILE *file)
     fwrite(&spiData, sizeof(spiData), 1, file);
 }
 
-void Spi::loadState(FILE *file)
+void Spi::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&writeCount, sizeof(writeCount), 1, file);

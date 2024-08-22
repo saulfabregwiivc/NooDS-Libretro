@@ -27,6 +27,7 @@
 #include <queue>
 
 #include "defines.h"
+#include "memfile.h"
 
 class Core;
 
@@ -36,8 +37,8 @@ class Gpu
         Gpu(Core *core);
         ~Gpu();
 
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         bool getFrame(uint32_t *out, bool gbaCrop);
         void invalidate3D() { dirty3D |= BIT(0); }

@@ -22,6 +22,7 @@
 
 #include <cstdint>
 #include "defines.h"
+#include "memfile.h"
 
 class Core;
 
@@ -46,8 +47,8 @@ class Memory
         uint8_t *pal3D[6] = {};
 
         Memory(Core *core): core(core) {};
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         bool loadBios9();
         bool loadBios7();

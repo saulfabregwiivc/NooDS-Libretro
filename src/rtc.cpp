@@ -22,7 +22,7 @@
 #include "rtc.h"
 #include "core.h"
 
-void Rtc::saveState(FILE *file)
+void Rtc::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&csCur, sizeof(csCur), 1, file);
@@ -37,7 +37,7 @@ void Rtc::saveState(FILE *file)
     fwrite(&gpControl, sizeof(gpControl), 1, file);
 }
 
-void Rtc::loadState(FILE *file)
+void Rtc::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&csCur, sizeof(csCur), 1, file);

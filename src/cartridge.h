@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "defines.h"
+#include "memfile.h"
 
 class Core;
 
@@ -77,8 +78,8 @@ class CartridgeNds: public Cartridge
 {
     public:
         CartridgeNds(Core *core): Cartridge(core) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void directBoot();
         void wordReady(bool cpu);
@@ -133,8 +134,8 @@ class CartridgeGba: public Cartridge
 {
     public:
         CartridgeGba(Core *core): Cartridge(core) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         uint8_t *getRom(uint32_t address);
         bool isEeprom(uint32_t address);

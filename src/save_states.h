@@ -23,6 +23,8 @@
 #include <cstdint>
 #include <string>
 
+#include "memfile.h"
+
 class Core;
 
 enum StateResult

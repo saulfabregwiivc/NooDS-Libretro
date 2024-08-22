@@ -76,7 +76,7 @@ template <typename T> void VramMapping::write(uint32_t address, T value)
             mappings[m][address + i] = value >> (i * 8);
 }
 
-void Memory::saveState(FILE *file)
+void Memory::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(ram, 1, sizeof(ram), file);
@@ -103,7 +103,7 @@ void Memory::saveState(FILE *file)
     fwrite(&haltCnt, sizeof(haltCnt), 1, file);
 }
 
-void Memory::loadState(FILE *file)
+void Memory::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(ram, 1, sizeof(ram), file);

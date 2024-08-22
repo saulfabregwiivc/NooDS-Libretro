@@ -20,7 +20,7 @@
 #include "ipc.h"
 #include "core.h"
 
-void Ipc::saveState(FILE *file)
+void Ipc::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(ipcSync, 2, sizeof(ipcSync) / 2, file);
@@ -37,7 +37,7 @@ void Ipc::saveState(FILE *file)
     }
 }
 
-void Ipc::loadState(FILE *file)
+void Ipc::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(ipcSync, 2, sizeof(ipcSync) / 2, file);

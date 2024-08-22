@@ -23,14 +23,16 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "memfile.h"
+
 class Core;
 
 class Dma
 {
     public:
         Dma(Core *core, bool cpu): core(core), cpu(cpu) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void transfer(int channel);
         void trigger(int mode, uint8_t channels = 0xF);

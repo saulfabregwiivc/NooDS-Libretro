@@ -45,7 +45,7 @@ Gpu2D::Gpu2D(Core *core, bool engine): core(core), engine(engine)
     }
 }
 
-void Gpu2D::saveState(FILE *file)
+void Gpu2D::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(winHFlip, sizeof(bool), sizeof(winHFlip) / sizeof(bool), file);
@@ -73,7 +73,7 @@ void Gpu2D::saveState(FILE *file)
     fwrite(&masterBright, sizeof(masterBright), 1, file);
 }
 
-void Gpu2D::loadState(FILE *file)
+void Gpu2D::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(winHFlip, sizeof(bool), sizeof(winHFlip) / sizeof(bool), file);

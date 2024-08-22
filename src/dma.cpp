@@ -20,7 +20,7 @@
 #include "dma.h"
 #include "core.h"
 
-void Dma::saveState(FILE *file)
+void Dma::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(srcAddrs, 4, sizeof(srcAddrs) / 4, file);
@@ -31,7 +31,7 @@ void Dma::saveState(FILE *file)
     fwrite(dmaCnt, 4, sizeof(dmaCnt) / 4, file);
 }
 
-void Dma::loadState(FILE *file)
+void Dma::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(srcAddrs, 4, sizeof(srcAddrs) / 4, file);

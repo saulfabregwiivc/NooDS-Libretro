@@ -23,6 +23,8 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "memfile.h"
+
 class Core;
 
 class Cp15
@@ -35,8 +37,8 @@ class Cp15
         uint32_t itcmSize = 0;
 
         Cp15(Core *core): core(core) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         uint32_t read(uint8_t cn, uint8_t cm, uint8_t cp);
         void write(uint8_t cn, uint8_t cm, uint8_t cp, uint32_t value);

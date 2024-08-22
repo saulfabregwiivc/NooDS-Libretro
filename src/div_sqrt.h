@@ -23,14 +23,16 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "memfile.h"
+
 class Core;
 
 class DivSqrt
 {
     public:
         DivSqrt(Core *core): core(core) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         uint16_t readDivCnt() { return divCnt; }
         uint32_t readDivNumerL() { return divNumer; }

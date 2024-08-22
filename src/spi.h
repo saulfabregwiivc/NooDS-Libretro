@@ -24,6 +24,8 @@
 #include <cstdio>
 #include <mutex>
 
+#include "memfile.h"
+
 enum Language
 {
     LG_JAPANESE = 0,
@@ -42,8 +44,8 @@ class Spi
         Spi(Core *core): core(core) {}
         ~Spi();
 
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         bool loadFirmware();
         void directBoot();

@@ -42,7 +42,7 @@ Gpu3DRenderer::~Gpu3DRenderer()
     }
 }
 
-void Gpu3DRenderer::saveState(FILE *file)
+void Gpu3DRenderer::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&disp3DCnt, sizeof(disp3DCnt), 1, file);
@@ -55,7 +55,7 @@ void Gpu3DRenderer::saveState(FILE *file)
     fwrite(toonTable, 2, sizeof(toonTable) / 2, file);
 }
 
-void Gpu3DRenderer::loadState(FILE *file)
+void Gpu3DRenderer::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&disp3DCnt, sizeof(disp3DCnt), 1, file);

@@ -64,13 +64,13 @@ int (Bios::*Bios::swiTableGba[])(uint32_t**) =
     &Bios::swiUnknown                                                                                 // 0x20
 };
 
-void Bios::saveState(FILE *file)
+void Bios::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&waitFlags, sizeof(waitFlags), 1, file);
 }
 
-void Bios::loadState(FILE *file)
+void Bios::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&waitFlags, sizeof(waitFlags), 1, file);

@@ -20,7 +20,7 @@
 #include "timers.h"
 #include "core.h"
 
-void Timers::saveState(FILE *file)
+void Timers::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(timers, 2, sizeof(timers) / 2, file);
@@ -30,7 +30,7 @@ void Timers::saveState(FILE *file)
     fwrite(tmCntH, 2, sizeof(tmCntH) / 2, file);
 }
 
-void Timers::loadState(FILE *file)
+void Timers::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(timers, 2, sizeof(timers) / 2, file);

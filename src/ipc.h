@@ -24,14 +24,16 @@
 #include <cstdio>
 #include <queue>
 
+#include "memfile.h"
+
 class Core;
 
 class Ipc
 {
     public:
         Ipc(Core *core): core(core) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         uint16_t readIpcSync(bool arm7) { return ipcSync[arm7]; }
         uint16_t readIpcFifoCnt(bool arm7) { return ipcFifoCnt[arm7]; }

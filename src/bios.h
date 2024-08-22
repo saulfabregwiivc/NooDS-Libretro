@@ -23,6 +23,8 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "memfile.h"
+
 class Core;
 
 class Bios
@@ -34,8 +36,8 @@ class Bios
 
         Bios(Core *core, bool arm7, int (Bios::**swiTable)(uint32_t**)):
             core(core), arm7(arm7), swiTable(swiTable) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         int execute(uint8_t vector, uint32_t **registers);
         void checkWaitFlags();

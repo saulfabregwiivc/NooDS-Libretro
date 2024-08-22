@@ -23,14 +23,16 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "memfile.h"
+
 class Core;
 
 class Gpu2D
 {
     public:
         Gpu2D(Core *core, bool engine);
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void reloadRegisters();
         void drawGbaScanline(int line);

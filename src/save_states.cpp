@@ -80,8 +80,8 @@ StateResult SaveStates::checkState()
 bool SaveStates::saveState()
 {
     // Open the state file and write the header
-    FILE *file = openFile("wb");
-    if (!file) return false;
+    MemFile file(openFile("wb"));
+    if (!file.opened()) return false;
     fwrite(stateTag, sizeof(uint8_t), 4, file);
     fwrite(&stateVersion, sizeof(uint32_t), 1, file);
 
@@ -118,8 +118,8 @@ bool SaveStates::saveState()
 bool SaveStates::loadState()
 {
     // Open the state file and read past the header
-    FILE *file = openFile("rb");
-    if (!file) return false;
+    MemFile file(openFile("rb"));
+    if (!file.opened()) return false;
     fseek(file, 8, SEEK_SET);
 
     // Load the state of every component

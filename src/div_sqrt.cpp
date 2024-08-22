@@ -22,7 +22,7 @@
 #include "div_sqrt.h"
 #include "core.h"
 
-void DivSqrt::saveState(FILE *file)
+void DivSqrt::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&divCnt, sizeof(divCnt), 1, file);
@@ -35,7 +35,7 @@ void DivSqrt::saveState(FILE *file)
     fwrite(&sqrtParam, sizeof(sqrtParam), 1, file);
 }
 
-void DivSqrt::loadState(FILE *file)
+void DivSqrt::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&divCnt, sizeof(divCnt), 1, file);

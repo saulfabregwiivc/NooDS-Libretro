@@ -23,14 +23,16 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "memfile.h"
+
 class Core;
 
 class Timers
 {
     public:
         Timers(Core *core, bool arm7): core(core), arm7(arm7) {}
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void resetCycles();
         void overflow(int timer);

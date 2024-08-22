@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "memfile.h"
 #include "action_replay.h"
 #include "bios.h"
 #include "cartridge.h"
@@ -138,8 +139,8 @@ class Core
 
         Core(std::string ndsRom = "", std::string gbaRom = "", int id = 0, int ndsRomFd = -1, int gbaRomFd = -1,
              int ndsSaveFd = -1, int gbaSaveFd = -1, int ndsStateFd = -1, int gbaStateFd = -1, int ndsCheatFd = -1);
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void runFrame() { (*runFunc)(*this); }
         void schedule(SchedTask task, uint32_t cycles);

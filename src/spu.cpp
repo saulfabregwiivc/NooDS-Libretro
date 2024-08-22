@@ -54,7 +54,7 @@ Spu::~Spu()
     delete[] bufferOut;
 }
 
-void Spu::saveState(FILE *file)
+void Spu::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&gbaFrameSequencer, sizeof(gbaFrameSequencer), 1, file);
@@ -107,7 +107,7 @@ void Spu::saveState(FILE *file)
     }
 }
 
-void Spu::loadState(FILE *file)
+void Spu::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&gbaFrameSequencer, sizeof(gbaFrameSequencer), 1, file);

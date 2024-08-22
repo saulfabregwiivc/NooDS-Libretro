@@ -27,7 +27,7 @@ Interpreter::Interpreter(Core *core, bool arm7): core(core), arm7(arm7)
         registers[i] = &registersUsr[i & 0xF];
 }
 
-void Interpreter::saveState(FILE *file)
+void Interpreter::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(pipeline, 4, sizeof(pipeline) / 4, file);
@@ -51,7 +51,7 @@ void Interpreter::saveState(FILE *file)
     fwrite(&postFlg, sizeof(postFlg), 1, file);
 }
 
-void Interpreter::loadState(FILE *file)
+void Interpreter::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(pipeline, 4, sizeof(pipeline) / 4, file);

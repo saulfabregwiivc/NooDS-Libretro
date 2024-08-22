@@ -50,7 +50,7 @@ Gpu::~Gpu()
     }
 }
 
-void Gpu::saveState(FILE *file)
+void Gpu::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(dispStat, 2, sizeof(dispStat) / 2, file);
@@ -59,7 +59,7 @@ void Gpu::saveState(FILE *file)
     fwrite(&powCnt1, sizeof(powCnt1), 1, file);
 }
 
-void Gpu::loadState(FILE *file)
+void Gpu::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(dispStat, 2, sizeof(dispStat) / 2, file);

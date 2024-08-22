@@ -142,7 +142,7 @@ Core::Core(std::string ndsRom, std::string gbaRom, int id, int ndsRomFd, int gba
     running.store(true);
 }
 
-void Core::saveState(FILE *file)
+void Core::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&gbaMode, sizeof(gbaMode), 1, file);
@@ -155,7 +155,7 @@ void Core::saveState(FILE *file)
         fwrite(&events[i], sizeof(events[i]), 1, file);
 }
 
-void Core::loadState(FILE *file)
+void Core::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&gbaMode, sizeof(gbaMode), 1, file);

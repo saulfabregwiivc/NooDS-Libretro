@@ -27,6 +27,8 @@
 #include <queue>
 #include <mutex>
 
+#include "memfile.h"
+
 class Core;
 
 class Spu
@@ -35,8 +37,8 @@ class Spu
         Spu(Core *core);
         ~Spu();
 
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         uint32_t *getSamples(int count);
         void runGbaSample();

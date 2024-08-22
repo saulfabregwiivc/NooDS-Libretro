@@ -25,6 +25,8 @@
 #include <cstdio>
 #include <thread>
 
+#include "memfile.h"
+
 class Core;
 struct Vertex;
 struct _Polygon;
@@ -35,8 +37,8 @@ class Gpu3DRenderer
         Gpu3DRenderer(Core *core);
         ~Gpu3DRenderer();
 
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void drawScanline(int line);
         uint32_t *getLine(int line);

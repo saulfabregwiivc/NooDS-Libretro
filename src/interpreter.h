@@ -23,6 +23,7 @@
 #include <cstdint>
 
 #include "defines.h"
+#include "memfile.h"
 
 class Core;
 class Bios;
@@ -31,8 +32,8 @@ class Interpreter
 {
     public:
         Interpreter(Core *core, bool arm7);
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void init();
         void directBoot();

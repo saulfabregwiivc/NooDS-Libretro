@@ -83,7 +83,7 @@ const uint8_t Gpu3D::paramCounts[] =
     3,  2,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, // 0x70-0x7F
 };
 
-void Gpu3D::saveState(FILE *file)
+void Gpu3D::saveState(MemFile &file)
 {
     // Write state data to the file
     fwrite(&state, sizeof(state), 1, file);
@@ -146,7 +146,7 @@ void Gpu3D::saveState(FILE *file)
         fwrite(&fifo[i], sizeof(fifo[i]), 1, file);
 }
 
-void Gpu3D::loadState(FILE *file)
+void Gpu3D::loadState(MemFile &file)
 {
     // Read state data from the file
     fread(&state, sizeof(state), 1, file);

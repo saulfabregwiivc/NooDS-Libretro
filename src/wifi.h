@@ -25,6 +25,8 @@
 #include <mutex>
 #include <vector>
 
+#include "memfile.h"
+
 class Core;
 
 enum PacketType
@@ -42,8 +44,8 @@ class Wifi
 {
     public:
         Wifi(Core *core);
-        void saveState(FILE *file);
-        void loadState(FILE *file);
+        void saveState(MemFile &file);
+        void loadState(MemFile &file);
 
         void addConnection(Core *core);
         void remConnection(Core *core);
