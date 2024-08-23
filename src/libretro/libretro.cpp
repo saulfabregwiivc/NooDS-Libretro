@@ -491,13 +491,35 @@ static void copyScreen(uint32_t *src, uint32_t *dst, int sw, int sh, int dx, int
   int scaleX = dw / sw;
   int scaleY = dh / sh;
 
-  for (int y = 0; y < dh; ++y)
+  if (scaleX > 1 || scaleY > 1)
   {
-    int srcY = (y / scaleY) * sw;
-    int dstY = (dy + y) * stride + dx;
+    for (int y = 0; y < dh; ++y)
+    {
+      int srcY = (y / scaleY) * sw;
+      int dstY = (dy + y) * stride + dx;
 
-    for (int x = 0; x < dw; ++x)
-      dst[dstY + x] = src[srcY + (x / scaleX)];
+      for (int x = 0; x < dw; ++x)
+        dst[dstY + x] = src[srcY + (x / scaleX)];
+    }
+  }
+  else if (dx == 0 && dw == stride)
+  {
+    int pixels = dw * dh * sizeof(uint32_t);
+    int offset = dy * stride + dx;
+
+    memcpy(dst + offset, src, pixels);
+  }
+  else
+  {
+    int rowSize = dw * sizeof(uint32_t);
+
+    for (int y = 0; y < dh; ++y)
+    {
+      int srcY = y * sw;
+      int dstY = (dy + y) * stride + dx;
+
+      memcpy(dst + dstY, src + srcY, rowSize);
+    }
   }
 }
 
