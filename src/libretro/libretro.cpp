@@ -1001,8 +1001,8 @@ void retro_run(void)
 
       if (moveX != 0 || moveY != 0)
       {
-        pointerX = touchX + static_cast<int>((moveX / 32767) * speedX);
-        pointerY = touchY + static_cast<int>((moveY / 32767) * speedY);
+        pointerX += static_cast<int>((moveX / 32767) * speedX);
+        pointerY += static_cast<int>((moveY / 32767) * speedY);
       }
     }
 
