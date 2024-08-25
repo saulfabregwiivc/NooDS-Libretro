@@ -3,17 +3,38 @@
 
 #include <sstream>
 #include <cstdio>
-#include <vector>
+#include <cstring>
 
 #include "defines.h"
 
 class MemFile
 {
     public:
-        MemFile() : stream(), file(nullptr) {}
-        ~MemFile() { close(); }
+        MemFile(size_t size = 1024 * 1024 * 8) :
+          file(nullptr), data(nullptr), dlen(0), rpos(0), wpos(0), eptr(false)
+        {
+            dlen = size;
+            data = new char[dlen];
+        }
 
-        MemFile(FILE* cfile) : stream(), file(cfile)
+        MemFile(void* buffer, size_t size) :
+          file(nullptr), data(nullptr), dlen(0), rpos(0), wpos(0), eptr(true)
+        {
+            dlen = size;
+            data = reinterpret_cast<char*>(buffer);
+        }
+
+        MemFile(const void* buffer, size_t size) :
+          file(nullptr), data(nullptr), dlen(0), rpos(0), wpos(0), eptr(false)
+        {
+            dlen = size;
+            data = new char[dlen];
+
+            memcpy(data, buffer, size);
+        }
+
+        MemFile(FILE* cfile) :
+          file(cfile), data(nullptr), dlen(0), rpos(0), wpos(0), eptr(false)
         {
             if (!file) return;
 
@@ -23,13 +44,21 @@ class MemFile
 
             if (fileSize > 0)
             {
-              std::vector<char> content(fileSize);
-              fread(content.data(), 1, fileSize, file);
+                dlen = fileSize;
+                data = new char[dlen];
 
-              stream.write(content.data(), fileSize);
-              stream.seekg(0, std::ios::beg);
-              stream.seekp(0, std::ios::beg);
+                fread(data, 1, dlen, file);
             }
+            else
+            {
+                dlen = 1024 * 1024 * 6;
+                data = new char[dlen];
+            }
+        }
+
+        ~MemFile()
+        {
+            close();
         }
 
         bool opened() const
@@ -39,53 +68,80 @@ class MemFile
 
         size_t write(const void* buffer, size_t size, size_t count)
         {
-            stream.write(static_cast<const char*>(buffer), size * count);
-            return size;
+            size_t wsize = size * count;
+
+            if (wpos + wsize > dlen)
+            {
+                dlen = wpos + wsize;
+                data = reinterpret_cast<char*>(realloc(data, dlen));
+            }
+
+            memcpy(data + wpos, buffer, wsize);
+            wpos += wsize;
+
+            return count;
         }
 
         size_t read(void* buffer, size_t size, size_t count)
         {
-            stream.read(static_cast<char*>(buffer), size * count);
-            return size;
+            size_t rsize = size * count;
+            if (rpos + rsize > dlen) rsize = dlen - rpos;
+
+            memcpy(buffer, data + rpos, rsize);
+            rpos += rsize;
+
+            return count;
         }
 
         int seek(long offset, int origin)
         {
-            std::ios_base::seekdir dir;
-
             switch (origin)
             {
-                case SEEK_SET: dir = std::ios::beg; break;
-                case SEEK_CUR: dir = std::ios::cur; break;
-                case SEEK_END: dir = std::ios::end; break;
+                case SEEK_SET: rpos = wpos = offset; break;
+                case SEEK_CUR: rpos = wpos = rpos + offset; break;
+                case SEEK_END: rpos = wpos = dlen + offset; break;
                 default: return -1;
             }
 
-            stream.seekg(offset, dir);
-            stream.seekp(offset, dir);
+            if (rpos < 0 || rpos > dlen)
+            {
+              rpos = wpos = 0;
+              return -1;
+            }
 
-            return stream.fail() ? -1 : 0;
+            return 0;
         }
 
         long tell()
         {
-            return static_cast<long>(stream.tellg());
+            return rpos;
         }
 
         void close()
         {
-            if (!file) return;
+            if (file)
+            {
+                fwrite(data, 1, dlen, file);
+                fclose(file);
+                file = nullptr;
+            }
 
-            std::string content = stream.str();
-            fwrite(content.data(), 1, content.size(), file);
-            fclose(file);
-
-            file = nullptr;
+            if (!eptr && data)
+            {
+                delete[] data;
+                data = nullptr;
+            }
         }
 
     private:
-        std::stringstream stream;
         FILE* file;
+        char* data;
+
+        size_t dlen;
+        size_t rpos;
+        size_t wpos;
+
+        bool eptr;
 };
 
 FORCE_INLINE size_t fread(void* buffer, size_t size, size_t count, MemFile &file)

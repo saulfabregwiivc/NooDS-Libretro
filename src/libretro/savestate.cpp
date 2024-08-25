@@ -30,7 +30,7 @@ bool SaveState::check(const void* data, size_t& size)
 bool SaveState::save(void* data, size_t& size)
 {
   // Open the state file and write the header
-  MemFile file;
+  MemFile file(data, size);
 
   file.write(stateTag, sizeof(uint8_t), 4);
   file.write(&stateVersion, sizeof(uint32_t), 1);
@@ -62,18 +62,14 @@ bool SaveState::save(void* data, size_t& size)
   core->wifi.saveState(file);
   core->saveState(file);
 
-  // Write save data to buffer
-  file.read(data, size, 1);
-
   return true;
 }
 
 bool SaveState::load(const void* data, size_t& size)
 {
   // Open the state file and read past the header
-  MemFile file;
+  MemFile file(data, size);
 
-  file.write(data, size, 1);
   file.seek(8, SEEK_SET);
 
   // Load the state of every component
