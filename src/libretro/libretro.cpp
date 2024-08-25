@@ -317,6 +317,7 @@ static void updateConfig()
   Settings::bios9Path = systemPath + "bios9.bin";
   Settings::bios7Path = systemPath + "bios7.bin";
   Settings::firmwarePath = systemPath + "firmware.bin";
+  Settings::gbaBiosPath = systemPath + "gba_bios.bin";
   Settings::sdImagePath = systemPath + "nds_sd_card.bin";
 
   Settings::directBoot = fetchVariableBool("noods_directBoot", true);
