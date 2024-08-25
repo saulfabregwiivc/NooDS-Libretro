@@ -1,6 +1,6 @@
 # Software Information
 display_name = "Nintendo - DS (NooDS)"
-authors = "Hydr8gon"
+authors = "Hydr8gon|Jonian Guveli"
 supported_extensions = "nds"
 corename = "NooDS"
 license = "GPLv3"
@@ -41,4 +41,4 @@ firmware3_path = "nds_sd_card.bin"
 firmware3_opt = "true"
 notes = "(!) bios7.bin (md5): df692a80a5b1bc90728bc3dfc76cd948|(!) bios9.bin (md5): a392174eb3e572fed6447e956bde4b25"
 
-description = "A speedy DS emulator"
+description = "Unofficial libretro port of NooDS, the speedy DS emulator"
