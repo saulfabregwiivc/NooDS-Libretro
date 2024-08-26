@@ -137,6 +137,11 @@ static int32_t clampValue(int32_t value, int32_t min, int32_t max)
   return std::max(min, std::min(max, value));
 }
 
+static bool endsWith(std::string str, std::string end)
+{
+  return str.find(end, str.length() - end.length()) != std::string::npos;
+}
+
 static std::string normalizePath(std::string path, bool addSlash = false)
 {
   std::string newPath = path;
@@ -345,6 +350,11 @@ static void updateConfig()
   ScreenLayout::screenSizing = fetchVariableEnum("noods_screenSizing", {"Even", "Enlarge Top", "Enlarge Bottom"});
   ScreenLayout::screenGap = fetchVariableEnum("noods_screenGap", {"None", "Quarter", "Half", "Full"});
 
+  envCallback(RETRO_ENVIRONMENT_SET_ROTATION, &screenRotation);
+}
+
+static void updateScreenLayout()
+{
   int screenSizing = 0; int screenWidth = 0; int screenHeight = 0;
 
   if (screenArrangement == 1 && screenRotation && ScreenLayout::screenSizing)
@@ -412,8 +422,6 @@ static void updateConfig()
   }
 
   memset(videoBuffer.data(), 0, videoBuffer.size() * sizeof(videoBuffer[0]));
-
-  envCallback(RETRO_ENVIRONMENT_SET_ROTATION, &screenRotation);
 }
 
 static void checkConfigVariables()
@@ -430,6 +438,7 @@ static void checkConfigVariables()
   if (updated)
   {
     updateConfig();
+    updateScreenLayout();
 
     retro_system_av_info info;
     retro_get_system_av_info(&info);
@@ -492,7 +501,7 @@ static void copyScreen(uint32_t *src, uint32_t *dst, int sw, int sh, int dx, int
   int scaleX = dw / sw;
   int scaleY = dh / sh;
 
-  if (scaleX > 1 || scaleY > 1)
+  if ((scaleX >= 1 && scaleY >= 1) && (scaleX > 1 || scaleY > 1))
   {
     for (int y = 0; y < dh; ++y)
     {
@@ -524,11 +533,14 @@ static void copyScreen(uint32_t *src, uint32_t *dst, int sw, int sh, int dx, int
   }
 }
 
-static void drawTexture(uint32_t *buffer)
+static void renderVideo()
 {
   bool shift = Settings::highRes3D || Settings::screenFilter == 1;
   auto width = layout.minWidth << shift;
   auto height = layout.minHeight << shift;
+
+  static uint32_t buffer[256 * 192 * 8];
+  core->gpu.getFrame(buffer, renderGbaScreen);
 
   if (renderGbaScreen)
   {
@@ -569,7 +581,7 @@ static void drawTexture(uint32_t *buffer)
   videoCallback(videoBuffer.data(), width, height, width * 4);
 }
 
-static void playbackAudio()
+static void renderAudio()
 {
   static int16_t buffer[547 * 2];
   uint32_t *original = core->spu.getSamples(547);
@@ -655,8 +667,9 @@ static void updateCursorState()
   }
 }
 
-static int getSaveFileDesc(std::string path)
+static int getSaveFileDesc(std::string romPath)
 {
+  std::string path = savesPath + getNameFromPath(romPath) + ".sav";
   int fd = open(path.c_str(), O_RDWR);
   if (fd == -1)
   {
@@ -688,11 +701,8 @@ static bool createCore(std::string ndsRom = "", std::string gbaRom = "")
 
     closeSaveFileDesc();
 
-    if (ndsRom != "")
-      ndsSaveFd = getSaveFileDesc(savesPath + getNameFromPath(ndsRom) + ".sav");
-
-    if (gbaRom != "")
-      gbaSaveFd = getSaveFileDesc(savesPath + getNameFromPath(gbaRom) + ".sav");
+    if (ndsRom != "") ndsSaveFd = getSaveFileDesc(ndsRom);
+    if (gbaRom != "") gbaSaveFd = getSaveFileDesc(gbaRom);
 
     core = new Core(ndsRom, gbaRom, 0, -1, -1, ndsSaveFd, gbaSaveFd);
     return true;
@@ -703,15 +713,9 @@ static bool createCore(std::string ndsRom = "", std::string gbaRom = "")
 
     switch (e)
     {
-      case ERROR_BIOS:
-        logCallback(RETRO_LOG_INFO, "Error Loading BIOS");
-        break;
-      case ERROR_FIRM:
-        logCallback(RETRO_LOG_INFO, "Error Loading Firmware");
-        break;
-      case ERROR_ROM:
-        logCallback(RETRO_LOG_INFO, "Error Loading ROM");
-        break;
+      case ERROR_BIOS: logCallback(RETRO_LOG_INFO, "Error Loading BIOS"); break;
+      case ERROR_FIRM: logCallback(RETRO_LOG_INFO, "Error Loading Firmware"); break;
+      case ERROR_ROM:  logCallback(RETRO_LOG_INFO, "Error Loading ROM"); break;
     }
 
     core = nullptr;
@@ -823,35 +827,32 @@ void retro_deinit(void)
   logCallback = nullptr;
 }
 
-bool retro_load_game_special(unsigned type, const struct retro_game_info* info, size_t info_size)
+bool retro_load_game_special(unsigned type, const struct retro_game_info* info, size_t size)
 {
   ndsPath = "";
   gbaPath = "";
 
-  for (size_t i = 0; i < info_size; i++)
+  for (size_t i = 0; i < size; i++)
   {
     std::string path = normalizePath(info[i].path);
 
-    if (path.find(".nds", path.length() - 4) != std::string::npos)
-      ndsPath = path;
-    else if (path.find(".gba", path.length() - 4) != std::string::npos)
-      gbaPath = path;
+    if (endsWith(path, ".nds")) ndsPath = path;
+    if (endsWith(path, ".gba")) gbaPath = path;
   }
 
   initConfig();
-  initInput();
-
-  if (fetchVariableBool("noods_directBoot", true) && type == 2)
-    gbaModeEnabled = true;
-  else
-    gbaModeEnabled = false;
-
   updateConfig();
-  updateScreenState();
-  openMicrophone();
 
   if (createCore(ndsPath, gbaPath))
   {
+    gbaModeEnabled = core->gbaMode;
+
+    updateScreenLayout();
+    updateScreenState();
+
+    initInput();
+    openMicrophone();
+
     core->cartridgeNds.writeSave();
     core->cartridgeGba.writeSave();
 
@@ -863,8 +864,10 @@ bool retro_load_game_special(unsigned type, const struct retro_game_info* info, 
 
 bool retro_load_game(const struct retro_game_info* info)
 {
-  size_t info_size = info ? 1 : 0;
-  return retro_load_game_special(0, info, info_size);
+  size_t bootType = 0;
+  size_t infoSize = info ? 1 : 0;
+
+  return retro_load_game_special(bootType, info, infoSize);
 }
 
 void retro_unload_game(void)
@@ -1032,11 +1035,8 @@ void retro_run(void)
 
   core->runFrame();
 
-  static uint32_t framebuffer[256 * 192 * 8];
-  core->gpu.getFrame(framebuffer, renderGbaScreen);
-
-  drawTexture(framebuffer);
-  playbackAudio();
+  renderVideo();
+  renderAudio();
 }
 
 void retro_set_controller_port_device(unsigned port, unsigned device)
