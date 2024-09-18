@@ -8,22 +8,39 @@ CPPFILES := $(foreach dir,$(SRCS),$(wildcard $(dir)/*.cpp))
 HFILES := $(foreach dir,$(SRCS),$(wildcard $(dir)/*.h))
 OFILES := $(patsubst %.cpp,$(BUILD)/%.o,$(CPPFILES))
 
-ifeq ($(OS),Windows_NT)
-  ARGS += -static -DWINDOWS
-  SHARED_EXT := .dll
+ifeq ($(platform),)
+	platform = unix
+	ifeq ($(shell uname -a),)
+		platform = win
+	else ifneq ($(findstring Darwin,$(shell uname -a)),)
+		platform = osx
+	else ifneq ($(findstring MINGW,$(shell uname -a)),)
+		platform = win
+	endif
+endif
+
+ifneq ($(findstring win,$(platform)),)
+	ARGS += -static -DWINDOWS
+	TARGET := $(NAME).dll
+else ifneq ($(findstring osx,$(platform)),)
+	ARGS += -DMACOS
+	TARGET := $(NAME).dylib
+
+	ifeq ($(CROSS_COMPILE),1)
+		ARGS += -target $(LIBRETRO_APPLE_PLATFORM) -isysroot $(LIBRETRO_APPLE_ISYSROOT)
+	endif
+else ifneq ($(findstring ios,$(platform)),)
+	TARGET := $(NAME)_ios.dylib
+else ifneq ($(findstring tvos,$(platform)),)
+	TARGET := $(NAME)_tvos.dylib
 else
-  ifeq ($(shell uname -s),Darwin)
-    ARGS += -DMACOS
-    SHARED_EXT := .dylib
-  else
-    SHARED_EXT := .so
-  endif
+  TARGET := $(NAME).so
 endif
 
 all: $(NAME)
 
 $(NAME): $(OFILES)
-	g++ -shared -o $@$(SHARED_EXT) $(ARGS) $^ $(LIBS)
+	g++ -shared -o $(TARGET) $(ARGS) $^ $(LIBS)
 
 $(BUILD)/%.o: %.cpp $(HFILES) $(BUILD)
 	g++ -c -fPIC -o $@ $(ARGS) $(INCS) $<
@@ -33,4 +50,4 @@ $(BUILD):
 
 clean:
 	rm -rf $(BUILD)
-	rm -f $(NAME)$(SHARED_EXT)
+	rm -f $(TARGET)
