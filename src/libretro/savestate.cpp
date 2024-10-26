@@ -3,7 +3,7 @@
 #include <cstring>
 
 const char* SaveState::stateTag = "NDSR";
-const uint32_t SaveState::stateVersion = 1;
+const uint32_t SaveState::stateVersion = 2;
 
 bool SaveState::check(const void* data, size_t& size)
 {

@@ -293,6 +293,7 @@ static void initConfig()
     { "noods_directBoot", "Direct Boot; enabled|disabled" },
     { "noods_fpsLimiter", "FPS Limiter; disabled|enabled" },
     { "noods_romInRam", "Keep ROM in RAM; disabled|enabled" },
+    { "noods_dsiMode", "DSi Homebrew Mode; disabled|enabled" },
     { "noods_threaded2D", "Threaded 2D; enabled|disabled" },
     { "noods_threaded3D", "Threaded 3D; 1 Thread|2 Threads|3 Threads|4 Threads|Disabled" },
     { "noods_highRes3D", "High Resolution 3D; disabled|enabled" },
@@ -328,6 +329,7 @@ static void updateConfig()
   Settings::directBoot = fetchVariableBool("noods_directBoot", true);
   Settings::fpsLimiter = fetchVariableBool("noods_fpsLimiter", false);
   Settings::romInRam = fetchVariableBool("noods_romInRam", false);
+  Settings::dsiMode = fetchVariableBool("noods_dsiMode", false);
   Settings::threaded2D = fetchVariableBool("noods_threaded2D", true);
   Settings::threaded3D = fetchVariableEnum("noods_threaded3D", {"Disabled", "1 Thread", "2 Threads", "3 Threads", "4 Threads"}, 1);
   Settings::highRes3D = fetchVariableBool("noods_highRes3D", false);
@@ -1079,7 +1081,7 @@ size_t retro_get_memory_size(unsigned id)
 {
   if (id == RETRO_MEMORY_SYSTEM_RAM)
   {
-    return 0x400000;
+    return core->dsiMode ? 0x1000000 : 0x400000;
   }
   return 0;
 }
