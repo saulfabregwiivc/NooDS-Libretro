@@ -7,6 +7,7 @@
 # Core definitions
 .core-defs:
   variables:
+    JNI_PATH: src/libretro
     MAKEFILE: Makefile.libretro
     CORENAME: noods
 
@@ -147,13 +148,13 @@ libretro-build-tvos-arm64:
 
 ################################### CONSOLES #################################
 # Nintendo WiiU
-libretro-build-wiiu:
-  extends:
-    - .libretro-wiiu-static-retroarch-master
-    - .core-defs
+# libretro-build-wiiu:
+#   extends:
+#     - .libretro-wiiu-static-retroarch-master
+#     - .core-defs
 
 # Nintendo Switch
-libretro-build-libnx-aarch64:
-  extends:
-    - .libretro-libnx-static-retroarch-master
-    - .core-defs
+# libretro-build-libnx-aarch64:
+#   extends:
+#     - .libretro-libnx-static-retroarch-master
+#     - .core-defs
